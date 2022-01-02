@@ -3,6 +3,7 @@ import ItemManagerContract from './contracts/ItemManager.json'
 import getWeb3 from './getWeb3'
 import Navbar from './components/Navbar'
 import ItemManager from './components/ItemManager'
+import { Typography } from '@mui/material'
 
 const initState = {
 	loaded: false,
@@ -69,7 +70,14 @@ const App = () => {
 	return (
 		<div className='App'>
 			<Navbar account={accounts[0]} />
-			<ItemManager createItem={createItem} items={state.items} />
+			{!state.loaded && (
+				<Typography variant='h6' align='center' mt={3} components='div'>
+					Loading...
+				</Typography>
+			)}
+			{state.loaded && (
+				<ItemManager createItem={createItem} items={state.items} />
+			)}
 		</div>
 	)
 }

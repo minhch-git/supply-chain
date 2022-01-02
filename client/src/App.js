@@ -63,24 +63,31 @@ const App = () => {
 	}, [state])
 
 	const createItem = async item => {
-		setState({ ...state, loaded: false })
-		let result = await state.itemManager.methods
-			.createItem(item.itemName, item.cost)
-			.send({ from: state.account })
-		const { _itemAddress, _itemIndex, _step } = await result.events
-			.SupplyChainStep.returnValues
+		try {
+			setState({ ...state, loaded: false })
+			let result = await state.itemManager.methods
+				.createItem(item.itemName, item.cost)
+				.send({ from: state.account })
+			const { _itemAddress, _itemIndex, _step } = await result.events
+				.SupplyChainStep.returnValues
 
-		const newItem = {
-			address: _itemAddress,
-			step: _step,
-			index: +_itemIndex,
-			price: item.cost,
-			identifier: item.itemName,
+			const newItem = {
+				address: _itemAddress,
+				step: _step,
+				index: +_itemIndex,
+				price: item.cost,
+				identifier: item.itemName,
+			}
+			setState({ ...state, loaded: true, items: [...state.items, newItem] })
+			toast.success(`Create ${item.itemName} success !`, {
+				position: toast.POSITION.BOTTOM_RIGHT,
+			})
+		} catch (error) {
+			console.log({ error })
+			toast.error(`Create failure !`, {
+				position: toast.POSITION.BOTTOM_RIGHT,
+			})
 		}
-		setState({ ...state, loaded: true, items: [...state.items, newItem] })
-		toast.success(`Create ${item.itemName} success !`, {
-			position: toast.POSITION.BOTTOM_RIGHT,
-		})
 	}
 
 	const triggerPayment = async (itemIndex, price) => {
@@ -91,12 +98,15 @@ const App = () => {
 		const { _itemIndex } = await result.events.SupplyChainStep.returnValues
 
 		let items = state.items.map(item => {
-			if (item.index === _itemIndex) {
-				item = { ...item, step: +item.step + 1 }
+			if (item.index == _itemIndex) {
+				item = { ...item, step: '1' }
 			}
 			return item
 		})
 		setState({ ...state, loaded: true, items })
+		toast.success(`Purchased successfully`, {
+			position: toast.POSITION.BOTTOM_RIGHT,
+		})
 	}
 
 	return (

@@ -1,6 +1,7 @@
 import {
 	Container,
 	Table,
+	Button,
 	TableBody,
 	TableCell,
 	TableContainer,
@@ -25,35 +26,47 @@ const Items = ({ items }) => {
 	return (
 		<Container>
 			<Typography
-				sx={{
-					fontWeight: 600,
-				}}
-				variant='h4'
-				component='h4'
-				mt={4}
-				mb={4}
+				sx={{ flex: '1 1 100%', fontWeight: 500 }}
+				variant='h6'
+				id='tableTitle'
+				component='div'
 			>
 				Items
 			</Typography>
-
 			<TableContainer>
 				<Table>
-					<TableHead>
+					<TableHead sx={{ background: '#c2c2db' }}>
 						<TableRow>
-							<TableCell align='center'>Address</TableCell>
-							<TableCell align='center'>Name</TableCell>
-							<TableCell align='center'>Price(eth)</TableCell>
-							<TableCell align='center'>State</TableCell>
+							<TableCell sx={{ fontWeight: 600 }} align='center'>
+								Name
+							</TableCell>
+							<TableCell sx={{ fontWeight: 600 }} align='center'>
+								Price(eth)
+							</TableCell>
+							<TableCell sx={{ fontWeight: 600 }} align='center'>
+								State
+							</TableCell>
+							<TableCell sx={{ fontWeight: 600 }} align='center'>
+								Owner
+							</TableCell>
+							<TableCell sx={{ fontWeight: 600 }} align='center'>
+								Actions
+							</TableCell>
 						</TableRow>
 					</TableHead>
 
 					<TableBody>
 						{rows.map(row => (
 							<TableRow key={row.address}>
-								<TableCell align='center'>{row.address}</TableCell>
 								<TableCell align='center'>{row.name}</TableCell>
 								<TableCell align='center'>{row.price}</TableCell>
 								<TableCell align='center'>{row.state}</TableCell>
+								<TableCell align='center'>{row.address}</TableCell>
+								<TableCell align='center'>
+									<Button size='small' variant='contained'>
+										Buy
+									</Button>
+								</TableCell>
 							</TableRow>
 						))}
 					</TableBody>

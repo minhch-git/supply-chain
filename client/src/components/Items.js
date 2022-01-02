@@ -10,18 +10,23 @@ import {
 	Typography,
 } from '@mui/material'
 
-const Items = ({ items }) => {
-	const createData = (address, name, _price, _state) => {
-		let state =
-			(_state === '0' && 'Created') ||
-			(_state === '1' && 'Paid') ||
-			(_state === '2' && 'Delivered')
-		let price = window.web3.utils.fromWei(_price, 'Ether')
-		return { address, name, price, state }
+const Items = ({ items, triggerPayment }) => {
+	const convertStepToState = state => {
+		return (
+			(state === '0' && 'Created') ||
+			(state === '1' && 'Paid') ||
+			(state === '2' && 'Delivered')
+		)
 	}
-	const rows = items.map(item =>
-		createData(item._item, item._identifier, item._itemPrice, item._state)
-	)
+
+	const convertWeiToEther = number => {
+		return window.web3.utils.fromWei(number, 'ether')
+	}
+
+	const handlePurchase = e => {
+		triggerPayment(e.target.name, e.target.value)
+	}
+
 	return (
 		<Container>
 			<Typography
@@ -55,14 +60,24 @@ const Items = ({ items }) => {
 					</TableHead>
 
 					<TableBody>
-						{rows.map(row => (
-							<TableRow key={row.address}>
-								<TableCell align='center'>{row.name}</TableCell>
-								<TableCell align='center'>{row.price}</TableCell>
-								<TableCell align='center'>{row.state}</TableCell>
-								<TableCell align='center'>{row.address}</TableCell>
+						{items.map(item => (
+							<TableRow key={item.index}>
+								<TableCell align='center'>{item.identifier}</TableCell>
 								<TableCell align='center'>
-									<Button size='small' variant='contained'>
+									{convertWeiToEther(item.price)}
+								</TableCell>
+								<TableCell align='center'>
+									{convertStepToState(item.step)}
+								</TableCell>
+								<TableCell align='center'>{item.address}</TableCell>
+								<TableCell align='center'>
+									<Button
+										value={item.price}
+										name={item.index}
+										size='small'
+										variant='contained'
+										onClick={handlePurchase}
+									>
 										Buy
 									</Button>
 								</TableCell>

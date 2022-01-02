@@ -7,7 +7,7 @@ import Avatar from '@mui/material/Avatar'
 import IconButton from '@mui/material/IconButton'
 import MenuIcon from '@mui/icons-material/Menu'
 
-export default function ButtonAppBar({ account }) {
+export default function Navbar({ account }) {
 	return (
 		<Box sx={{ flexGrow: 1 }}>
 			<AppBar position='static'>

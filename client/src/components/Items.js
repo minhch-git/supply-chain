@@ -11,18 +11,17 @@ import {
 } from '@mui/material'
 
 const Items = ({ items }) => {
-	const createData = (address, name, price, _state) => {
-		console.log({ _state })
+	const createData = (address, name, _price, _state) => {
 		let state =
 			(_state === '0' && 'Created') ||
 			(_state === '1' && 'Paid') ||
 			(_state === '2' && 'Delivered')
+		let price = window.web3.utils.fromWei(_price, 'Ether')
 		return { address, name, price, state }
 	}
 	const rows = items.map(item =>
-		createData(item._item, item._itemPrice, item._identifier, item._state)
+		createData(item._item, item._identifier, item._itemPrice, item._state)
 	)
-
 	return (
 		<Container>
 			<Typography

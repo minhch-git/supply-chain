@@ -11,6 +11,7 @@ const initState = {
 	itemManager: {},
 	items: [],
 }
+
 const App = () => {
 	const [state, setState] = useState(initState)
 	const [accounts, setAccounts] = useState([])
@@ -18,6 +19,7 @@ const App = () => {
 		const loadBlockChainData = async () => {
 			try {
 				const web3 = await getWeb3()
+				window.web3 = web3
 				setAccounts(await web3.eth.getAccounts())
 
 				const networkId = await web3.eth.net.getId()

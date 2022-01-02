@@ -17,7 +17,10 @@ const Form = ({ createItem }) => {
 
 	const [disableSubmit, setDisableSubmit] = useState(true)
 
-	const handleCreateItem = () => createItem(item)
+	const handleCreateItem = () => {
+		let cost = window.web3.utils.toWei(item.cost, 'ether')
+		createItem({ ...item, cost })
+	}
 	return (
 		<Container maxWidth='sm'>
 			<Typography

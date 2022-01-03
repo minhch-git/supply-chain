@@ -27,6 +27,10 @@ const Items = ({ items, triggerPayment }) => {
 		triggerPayment(e.target.name, e.target.value)
 	}
 
+	const handleDelivery = e => {
+		console.log(e.target.name, e.target.value)
+	}
+
 	return (
 		<Container>
 			<Typography
@@ -76,9 +80,11 @@ const Items = ({ items, triggerPayment }) => {
 										name={item.index}
 										size='small'
 										variant='contained'
-										onClick={handlePurchase}
+										onClick={
+											item.step === '0' ? handlePurchase : handleDelivery
+										}
 									>
-										Buy
+										{item.step === '0' ? 'Buy' : 'Delivery'}
 									</Button>
 								</TableCell>
 							</TableRow>

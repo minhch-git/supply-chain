@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import ItemManagerContract from './contracts/ItemManager.json'
+import ItemContract from './contracts/Item.json'
 import getWeb3 from './getWeb3'
 import Navbar from './components/Navbar'
 import ItemManager from './components/ItemManager'
@@ -31,6 +32,12 @@ const App = () => {
 						ItemManagerContract.networks[networkId].address
 				)
 
+				const item = new web3.eth.Contract(
+					ItemContract.abi,
+					ItemContract.networks[networkId] &&
+						ItemContract.networks[networkId].address
+				)
+
 				const lastItemIndex = await itemManager.methods.itemIndex().call()
 				let items = []
 				for (let i = 0; i < parseInt(lastItemIndex); i++) {
@@ -48,6 +55,7 @@ const App = () => {
 				setState({
 					...state,
 					itemManager,
+					item,
 					account: accounts[0],
 					loaded: true,
 					items: [...state.items, ...items],

@@ -10,7 +10,7 @@ import {
 	Typography,
 } from '@mui/material'
 
-const Items = ({ items, triggerPayment }) => {
+const Items = ({ items, triggerPayment, triggerDelivery }) => {
 	const convertStepToState = state => {
 		return (
 			(state === '0' && 'Created') ||
@@ -25,6 +25,10 @@ const Items = ({ items, triggerPayment }) => {
 
 	const handlePurchase = e => {
 		triggerPayment(e.target.name, e.target.value)
+	}
+
+	const handleDelivery = e => {
+		triggerDelivery(e.target.name, e.target.value)
 	}
 
 	return (
@@ -51,7 +55,7 @@ const Items = ({ items, triggerPayment }) => {
 								State
 							</TableCell>
 							<TableCell sx={{ fontWeight: 600 }} align='center'>
-								Owner
+								Address Item
 							</TableCell>
 							<TableCell sx={{ fontWeight: 600 }} align='center'>
 								Actions
@@ -71,15 +75,30 @@ const Items = ({ items, triggerPayment }) => {
 								</TableCell>
 								<TableCell align='center'>{item.address}</TableCell>
 								<TableCell align='center'>
-									<Button
+
+									{
+										item.step === '2' ?
+										<Button
 										value={item.price}
 										name={item.index}
 										size='small'
 										variant='contained'
-										onClick={handlePurchase}
-									>
-										Buy
-									</Button>
+										disabled='true'
+										>
+											Done
+										</Button>
+										 :
+										<Button
+										value={item.price}
+										name={item.index}
+										size='small'
+										variant='contained'
+										onClick={item.step === '0' ? handlePurchase : handleDelivery }
+										>
+											{item.step === '0' ? 'Buy' : 'Delivery'}
+										</Button>
+									}
+							
 								</TableCell>
 							</TableRow>
 						))}

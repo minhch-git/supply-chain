@@ -98,13 +98,33 @@ const App = () => {
 		const { _itemIndex } = await result.events.SupplyChainStep.returnValues
 
 		let items = state.items.map(item => {
-			if (item.index == _itemIndex) {
+			if (item.index === _itemIndex) {
 				item = { ...item, step: '1' }
 			}
 			return item
 		})
 		setState({ ...state, loaded: true, items })
-		toast.success(`Purchased successfully`, {
+		toast.success(`Purchased successfully, delivery now!`, {
+			position: toast.POSITION.BOTTOM_RIGHT,
+		})
+	}
+
+	const triggerDelivery = async (itemIndex) => {
+		setState({ ...state, loaded: false })
+		let result = await state.itemManager.methods
+			.triggerDelivery(itemIndex)
+			.send({ from: state.account})
+		const { _itemIndex } = await result.events.SupplyChainStep.returnValues
+
+		let items = state.items.map(item => {
+			if (item.index === _itemIndex) {
+				item = { ...item, step: '2' }
+			}
+			return item
+		})
+		setState({ ...state, loaded: true, items })
+		console.log('Delivery')
+		toast.success(`Delivery successfully`, {
 			position: toast.POSITION.BOTTOM_RIGHT,
 		})
 	}
@@ -123,6 +143,7 @@ const App = () => {
 					createItem={createItem}
 					items={state.items}
 					triggerPayment={triggerPayment}
+					triggerDelivery={triggerDelivery}
 				/>
 			)}
 		</div>

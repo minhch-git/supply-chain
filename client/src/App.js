@@ -1,65 +1,79 @@
 import React, { useEffect, useState } from 'react'
-import ItemManagerContract from './contracts/ItemManager.json'
-import ItemContract from './contracts/Item.json'
-import getWeb3 from './getWeb3'
-import Navbar from './components/Navbar'
-import ItemManager from './components/ItemManager'
-import { Typography } from '@mui/material'
-import { ToastContainer, toast } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import axios from 'axios'
+import { useStore, actions, useAuth, authActions } from './store'
 
-const initState = {
-	loaded: false,
-	account: '',
-	item: {},
-	itemManager: {},
-	items: [],
-}
+import Navbar from './components/Navbar'
+import Main from './playground/Main'
+import Dashboard from './playground/Dashboard'
+import NewProductForm from './playground/NewProductForm'
+import ProductDetail from './playground/ProductDetail'
+import LoginPage from './playground/Login'
+
+import MarketplaceContract from './contracts/Marketplace.json'
+
+import getWeb3 from './getWeb3'
+import 'react-toastify/dist/ReactToastify.css'
+import LoadingPage from './components/LoadingPage'
+import { toast, ToastContainer } from 'react-toastify'
 
 const App = () => {
-	const [state, setState] = useState(initState)
+	// const [state, setState] = useState(initState)
+	const [loading, setLoading] = useState(true)
+	const [_, dispatch] = useStore()
+	const [authState, authDispatch] = useAuth()
+	const { isLoggedIn, token } = authState
+
 	useEffect(() => {
 		const loadBlockChainData = async () => {
 			try {
 				const web3 = await getWeb3()
-				window.web3 = web3
 				const accounts = await web3.eth.getAccounts()
 				const networkId = await web3.eth.net.getId()
+				const marketplaceAbi = MarketplaceContract.abi
+				const marketplaceData = MarketplaceContract.networks[networkId]
 
-				const itemManager = new web3.eth.Contract(
-					ItemManagerContract.abi,
-					ItemManagerContract.networks[networkId] &&
-						ItemManagerContract.networks[networkId].address
+				const marketplace = new web3.eth.Contract(
+					marketplaceAbi,
+					marketplaceData && marketplaceData.address
 				)
 
-				const item = new web3.eth.Contract(
-					ItemContract.abi,
-					ItemContract.networks[networkId] &&
-						ItemContract.networks[networkId].address
-				)
+				const productCount = await marketplace.methods.productCount().call()
 
-				const lastItemIndex = await itemManager.methods.itemIndex().call()
-				let items = []
-				for (let i = 0; i < parseInt(lastItemIndex); i++) {
-					const result = await itemManager.methods.items(i).call()
-					const item = {
-						address: result._item,
-						step: result._state,
-						index: i,
-						price: result._itemPrice,
-						identifier: result._identifier,
+				let products = []
+				for (let index = parseInt(productCount); index >= 1; index--) {
+					const productObj = await marketplace.methods.products(index).call()
+					const product = {
+						name: productObj.name,
+						index: productObj.index,
+						price: productObj.price,
+						owner: productObj.owner,
+						address: productObj.product,
+						step: productObj.state,
 					}
 
-					items = [...items, item]
+					products = [...products, product]
 				}
-				setState({
-					...state,
-					itemManager,
-					item,
-					account: accounts[0],
-					loaded: true,
-					items: [...state.items, ...items],
+
+				products = products.map(async prod => {
+					const res = await axios.get(
+						`http://localhost:8888/api/products/address/${prod.address}`
+					)
+
+					return {
+						openSale: res.data?.openSale,
+						image: res.data?.image,
+						createdAt: res.data?.createdAt,
+						...prod,
+						owner: res.data?.user ? res.data.user : prod.owner,
+					}
 				})
+
+				products = await Promise.all(products)
+				window.web3 = web3
+				dispatch(actions.getMarketData({ marketplace, products }))
+				authDispatch(authActions.setAccount(accounts[0]))
+				setLoading(false)
 			} catch (error) {
 				alert(
 					`Failed to load web3, accounts, or contract. Check console for details.`
@@ -68,72 +82,103 @@ const App = () => {
 			}
 		}
 		loadBlockChainData()
-	}, [state])
-
-	const createItem = async item => {
-		try {
-			setState({ ...state, loaded: false })
-			let result = await state.itemManager.methods
-				.createItem(item.itemName, item.cost)
-				.send({ from: state.account })
-			const { _itemAddress, _itemIndex, _step } = await result.events
-				.SupplyChainStep.returnValues
-
-			const newItem = {
-				address: _itemAddress,
-				step: _step,
-				index: +_itemIndex,
-				price: item.cost,
-				identifier: item.itemName,
+	}, [dispatch, authDispatch])
+	// Get ac_token
+	useEffect(() => {
+		const _appSignging = localStorage.getItem('_appSignging')
+		if (_appSignging) {
+			const getToken = async () => {
+				try {
+					const res = await axios.get(
+						'http://localhost:8888/api/auth/access_token',
+						{
+							withCredentials: true,
+						}
+					)
+					authDispatch(authActions.getToken(res.data.ac_token))
+				} catch (error) {
+					console.log({ error })
+				}
 			}
-			setState({ ...state, loaded: true, items: [...state.items, newItem] })
-			toast.success(`Create ${item.itemName} success !`, {
-				position: toast.POSITION.BOTTOM_RIGHT,
-			})
-		} catch (error) {
-			console.log({ error })
-			toast.error(`Create failure !`, {
-				position: toast.POSITION.BOTTOM_RIGHT,
+			getToken()
+		}
+	}, [authDispatch, isLoggedIn])
+
+	// get user data
+	useEffect(() => {
+		if (token) {
+			authDispatch(authActions.signing())
+			const getUser = async () => {
+				const res = await axios.get('http://localhost:8888/api/users/me', {
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				})
+				authDispatch(authActions.getUser(res.data.user))
+			}
+			getUser()
+		}
+	}, [authDispatch, token])
+
+	// Account change
+	useEffect(() => {
+		async function listenMMAccount() {
+			window.ethereum.on('accountsChanged', async function () {
+				const accounts = await window.web3.eth.getAccounts()
+				try {
+					const _appSignging = localStorage.getItem('_appSignging')
+					if (_appSignging && token) {
+						await axios.get('http://localhost:8888/api/auth/signout', {
+							withCredentials: true,
+							headers: {
+								Authorization: `Bearer ${token}`,
+							},
+						})
+						localStorage.removeItem('_appSignging')
+						authDispatch(authActions.signOut())
+					}
+
+					setLoading(true)
+					authDispatch(authActions.setAccount(accounts[0]))
+				} catch (err) {
+					return toast.error(err.response.data.message, {
+						position: toast.POSITION.BOTTOM_RIGHT,
+					})
+				}
+				setLoading(false)
 			})
 		}
-	}
-
-	const triggerPayment = async (itemIndex, price) => {
-		setState({ ...state, loaded: false })
-		let result = await state.itemManager.methods
-			.triggerPayment(itemIndex)
-			.send({ from: state.account, value: price })
-		const { _itemIndex } = await result.events.SupplyChainStep.returnValues
-
-		let items = state.items.map(item => {
-			if (item.index == _itemIndex) {
-				item = { ...item, step: '1' }
-			}
-			return item
-		})
-		setState({ ...state, loaded: true, items })
-		toast.success(`Purchased successfully`, {
-			position: toast.POSITION.BOTTOM_RIGHT,
-		})
-	}
+		listenMMAccount()
+	}, [token, setLoading, authDispatch])
 
 	return (
-		<div className='App'>
-			<ToastContainer autoClose={4000} />
-			<Navbar account={state.account} />
-			{!state.loaded && (
-				<Typography variant='h6' align='center' mt={3} components='div'>
-					Loading...
-				</Typography>
-			)}
-			{state.loaded && (
-				<ItemManager
-					createItem={createItem}
-					items={state.items}
-					triggerPayment={triggerPayment}
-				/>
-			)}
-		</div>
+		<>
+			<BrowserRouter>
+				<div className='App'>
+					<ToastContainer />
+					{isLoggedIn && <Navbar name={authState.user.name} />}
+					{loading && <LoadingPage />}
+
+					{!loading && (
+						<Routes>
+							{!isLoggedIn ? (
+								<Route path='/' element={<LoginPage />} />
+							) : (
+								<>
+									<Route path='/' element={<Main />} />
+									<Route path='/dashboard' element={<Dashboard />} />
+									<Route
+										path='/products/:address'
+										element={<ProductDetail />}
+									/>
+									<Route path='/products/new' element={<NewProductForm />} />
+								</>
+							)}
+						</Routes>
+					)}
+				</div>
+			</BrowserRouter>
+		</>
 	)
 }
 

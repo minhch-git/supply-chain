@@ -1,5 +1,5 @@
-const ItemManager = artifacts.require('../ItemManager.sol')
+const Marketplace = artifacts.require('Marketplace')
 
 module.exports = function (deployer) {
-	deployer.deploy(ItemManager)
+	deployer.deploy(Marketplace)
 }

@@ -1,32 +1,172 @@
-import * as React from 'react'
-import AppBar from '@mui/material/AppBar'
-import Box from '@mui/material/Box'
-import Toolbar from '@mui/material/Toolbar'
-import Typography from '@mui/material/Typography'
-import Avatar from '@mui/material/Avatar'
-import IconButton from '@mui/material/IconButton'
-import MenuIcon from '@mui/icons-material/Menu'
+import axios from 'axios'
+import { toast, ToastContainer } from 'react-toastify'
+import {
+	AppBar,
+	Box,
+	Container,
+	Toolbar,
+	Typography,
+	IconButton,
+	Button,
+	Menu,
+	Avatar,
+	Tooltip,
+	MenuItem,
+} from '@mui/material'
+import { useEffect, useState } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
+import BackgroundLetterAvatar from './BackgroundLetterAvatar'
+import { authActions, useAuth } from '../store'
+import { deepPurple } from '@mui/material/colors'
 
-export default function Navbar({ account }) {
+const pages = [
+	{
+		text: 'Home',
+		link: '/',
+	},
+	{
+		text: 'Pricing',
+		link: '/pricing',
+	},
+]
+const settings = [
+	{
+		text: 'Account',
+		link: 'account',
+	},
+	{
+		text: 'Dashboard',
+		link: 'dashboard',
+	},
+]
+
+const Navbar = ({ name }) => {
+	const [anchorElUser, setAnchorElUser] = useState(null)
+	let navigate = useNavigate()
+	const [authState, authDispatch] = useAuth()
+
+	const handleSwitchPage = async e => {
+		navigate(`${e.currentTarget.value}`)
+	}
+	const handleOpenUserMenu = event => {
+		setAnchorElUser(event.currentTarget)
+	}
+
+	const handleCloseUserMenu = event => {
+		setAnchorElUser(null)
+	}
+
+	const handleLogout = async () => {
+		try {
+			const _appSignging = localStorage.getItem('_appSignging')
+			if (_appSignging && authState.token) {
+				await axios.get('http://localhost:8888/api/auth/signout', {
+					withCredentials: true,
+					headers: {
+						Authorization: `Bearer ${authState.token}`,
+					},
+				})
+				localStorage.removeItem('_appSignging')
+				authDispatch(authActions.signOut())
+				navigate(`/`)
+			}
+		} catch (err) {
+			return toast.error(err.response.data.message, {
+				position: toast.POSITION.BOTTOM_RIGHT,
+			})
+		}
+	}
 	return (
-		<Box sx={{ flexGrow: 1 }}>
-			<AppBar position='static'>
-				<Toolbar>
-					<IconButton
-						size='large'
-						edge='start'
-						color='inherit'
-						aria-label='menu'
-						sx={{ mr: 2 }}
-					>
-						<MenuIcon />
-					</IconButton>
-					<Typography variant='h6' component='div' sx={{ flexGrow: 1 }}>
-						Event Trigger / Supply Chain
-					</Typography>
-					<Avatar sx={{ bgcolor: 'blue' }} src='images/avatar.png' />
-				</Toolbar>
+		<>
+			<AppBar sx={{ backgroundColor: 'transparent' }} position='static'>
+				<Container>
+					<Toolbar disableGutters>
+						<Typography
+							variant='h6'
+							noWrap
+							component='div'
+							sx={{
+								mr: 2,
+								display: { xs: 'none', md: 'flex' },
+								color: '#1dd6e9',
+								fontWeight: 600,
+							}}
+						>
+							MARKET-PLACE
+						</Typography>
+
+						<Box
+							sx={{
+								flexGrow: 1,
+								display: { xs: 'none', md: 'flex' },
+								justifyContent: 'center',
+								marginLeft: '-172.812px',
+							}}
+						>
+							{pages.map(page => (
+								<Button
+									key={page.text}
+									value={page.link}
+									onClick={handleSwitchPage}
+									sx={{ my: 2, color: 'white', display: 'block' }}
+								>
+									{page.text}
+								</Button>
+							))}
+						</Box>
+
+						<Box sx={{ flexGrow: 0 }}>
+							{name && (
+								<Tooltip title='Open settings'>
+									<IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+										<Avatar sx={{ bgcolor: deepPurple[500] }}>
+											{name.split('')[0]}
+										</Avatar>
+									</IconButton>
+								</Tooltip>
+							)}
+							<Menu
+								sx={{ mt: '45px' }}
+								id='menu-appbar'
+								anchorEl={anchorElUser}
+								anchorOrigin={{
+									vertical: 'top',
+									horizontal: 'right',
+								}}
+								keepMounted
+								transformOrigin={{
+									vertical: 'top',
+									horizontal: 'right',
+								}}
+								open={Boolean(anchorElUser)}
+								onClose={handleCloseUserMenu}
+							>
+								{settings.map(setting => (
+									<Link
+										key={setting.text}
+										to={`${setting.link}`}
+										style={{ textDecoration: 'none' }}
+										onClick={handleCloseUserMenu}
+									>
+										<MenuItem>
+											<Typography textAlign='center'>{setting.text}</Typography>
+										</MenuItem>
+									</Link>
+								))}
+
+								<MenuItem>
+									<Typography textAlign='center' onClick={handleLogout}>
+										Logout
+									</Typography>
+								</MenuItem>
+							</Menu>
+						</Box>
+					</Toolbar>
+				</Container>
 			</AppBar>
-		</Box>
+			<ToastContainer />
+		</>
 	)
 }
+
+export default Navbar

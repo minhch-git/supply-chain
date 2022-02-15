@@ -1,0 +1,5 @@
+export const SET_ACCOUNT = 'setAccount'
+export const SIGNING = 'signing'
+export const GET_TOKEN = 'getToken'
+export const GET_USER = 'getUser'
+export const SIGN_OUT = 'signOut'

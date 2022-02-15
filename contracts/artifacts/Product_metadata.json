@@ -1,0 +1,141 @@
+{
+	"compiler": {
+		"version": "0.5.1+commit.c8a2cb62"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"constant": true,
+				"inputs": [],
+				"name": "name",
+				"outputs": [
+					{
+						"name": "",
+						"type": "string"
+					}
+				],
+				"payable": false,
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"constant": true,
+				"inputs": [],
+				"name": "index",
+				"outputs": [
+					{
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"payable": false,
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"constant": true,
+				"inputs": [
+					{
+						"name": "_index",
+						"type": "uint256"
+					}
+				],
+				"name": "getProductByIndex",
+				"outputs": [
+					{
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"payable": false,
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"constant": true,
+				"inputs": [],
+				"name": "price",
+				"outputs": [
+					{
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"payable": false,
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"constant": true,
+				"inputs": [],
+				"name": "state",
+				"outputs": [
+					{
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"payable": false,
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"name": "_parentContract",
+						"type": "address"
+					},
+					{
+						"name": "_index",
+						"type": "uint256"
+					},
+					{
+						"name": "_name",
+						"type": "string"
+					},
+					{
+						"name": "_price",
+						"type": "uint256"
+					}
+				],
+				"payable": false,
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			}
+		],
+		"devdoc": {
+			"methods": {}
+		},
+		"userdoc": {
+			"methods": {}
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/Product.sol": "Product"
+		},
+		"evmVersion": "byzantium",
+		"libraries": {},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/Marketplace.sol": {
+			"keccak256": "0xffe33bed8474f9cac721b696ef6a069a9dc1f068eaaeec16b2a88f884d6390a0",
+			"urls": [
+				"bzzr://3f3afcdc91e2a1769eeae8c438025e555d1d5d40acba7b98709733af4db707f1"
+			]
+		},
+		"contracts/Product.sol": {
+			"keccak256": "0x38f004cae00d4b5ae2628cd85e9fe7d6cdc3baccbc57f71e56718a81b39a857d",
+			"urls": [
+				"bzzr://f9180d18fcb2719d6ce4ca667f06570df3ac0bb92e46f0530bc40fee4fa81252"
+			]
+		}
+	},
+	"version": 1
+}

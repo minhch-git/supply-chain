@@ -1,0 +1,222 @@
+{
+	"compiler": {
+		"version": "0.5.1+commit.c8a2cb62"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"constant": true,
+				"inputs": [],
+				"name": "name",
+				"outputs": [
+					{
+						"name": "",
+						"type": "string"
+					}
+				],
+				"payable": false,
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"constant": false,
+				"inputs": [
+					{
+						"name": "index",
+						"type": "uint256"
+					}
+				],
+				"name": "purchaseProduct",
+				"outputs": [],
+				"payable": true,
+				"stateMutability": "payable",
+				"type": "function"
+			},
+			{
+				"constant": true,
+				"inputs": [
+					{
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "products",
+				"outputs": [
+					{
+						"name": "product",
+						"type": "address"
+					},
+					{
+						"name": "index",
+						"type": "uint256"
+					},
+					{
+						"name": "name",
+						"type": "string"
+					},
+					{
+						"name": "price",
+						"type": "uint256"
+					},
+					{
+						"name": "owner",
+						"type": "address"
+					},
+					{
+						"name": "state",
+						"type": "uint8"
+					}
+				],
+				"payable": false,
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"constant": true,
+				"inputs": [],
+				"name": "productCount",
+				"outputs": [
+					{
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"payable": false,
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"constant": false,
+				"inputs": [
+					{
+						"name": "_name",
+						"type": "string"
+					},
+					{
+						"name": "_price",
+						"type": "uint256"
+					}
+				],
+				"name": "createProduct",
+				"outputs": [],
+				"payable": false,
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"payable": false,
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"name": "product",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"name": "index",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"name": "name",
+						"type": "string"
+					},
+					{
+						"indexed": false,
+						"name": "price",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"name": "owner",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"name": "step",
+						"type": "uint256"
+					}
+				],
+				"name": "ProductCreated",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"name": "product",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"name": "index",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"name": "name",
+						"type": "string"
+					},
+					{
+						"indexed": false,
+						"name": "price",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"name": "owner",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"name": "step",
+						"type": "uint256"
+					}
+				],
+				"name": "ProductPurchased",
+				"type": "event"
+			}
+		],
+		"devdoc": {
+			"methods": {}
+		},
+		"userdoc": {
+			"methods": {}
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/Marketplace.sol": "Marketplace"
+		},
+		"evmVersion": "byzantium",
+		"libraries": {},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/Marketplace.sol": {
+			"keccak256": "0xdd4efd059ea1b58692bb2c8d90e3e721f5f6e5780c018b304c91a4eace30370b",
+			"urls": [
+				"bzzr://3557e0c255b6c63a81bd845a58b2dbcfd60673428f174c0fb2e593b0fce4fd11"
+			]
+		},
+		"contracts/Product.sol": {
+			"keccak256": "0x38f004cae00d4b5ae2628cd85e9fe7d6cdc3baccbc57f71e56718a81b39a857d",
+			"urls": [
+				"bzzr://f9180d18fcb2719d6ce4ca667f06570df3ac0bb92e46f0530bc40fee4fa81252"
+			]
+		}
+	},
+	"version": 1
+}
